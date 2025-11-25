@@ -2,6 +2,9 @@ import os
 
 from time import sleep
 
+class InvalidEntry(Exception):
+    pass
+
 contactList = {
     1: {
         "Name": "Example Contact",
@@ -26,33 +29,30 @@ def advanced_input(mode:int, rule:str, input_text:str):
 
     if mode not in (1, 2):
         print("Modo inválido para a função advanced_input.")
-        return 0
-    elif rule not in ("just_number", "just_text", "both"):
+        return False
+    
+    if rule not in ("just_number", "just_text", "both"): # --caiosalesi: fez bem aqui em colocar a tratativa de erro antes do código, mas não precisa colocar elif nesse caso, só if serve, mais limpo
         print("Regra inválida para a função advanced_input.")
-        return 0
+        return False
 
-    while 1:
+    while True:
         response = input(input_text)
 
-        if response == "":
-            if mode == 1:
-                print("[!] Esse campo é obrigatório.")
-            else:
-                return response
-        else:
-            if rule == "just_number":
-                if not response.isnumeric():
-                    print("[!] Resposta inválida. Digite apenas NÚMEROS, sem letras ou caracteres especiais.")
-                else:
-                    return response
-            elif rule == "just_text":
-                if not response.replace(" ", "").isalpha():
-                    print("[!] Resposta inválida. Digite apenas LETRAS, sem números ou caracteres especiais.")
-                else:
-                    return response
-            else:
-                return response
+        try: # --caiosalesi: mudei pra um try-except pra ajudar na visualização do erro aqui. não esqueça que raise e return interrompem a execução do código, diferença é que raise serve pra tratativa de erro também
+            if (response == "") and (mode == 1):
+                raise InvalidEntry("Esse campo é obrigatório.")
+            
+            if (rule == "just_number") and (not response.isnumeric()):
+                raise InvalidEntry("Resposta inválida. Digite apenas NÚMEROS, sem letras ou caracteres especiais.")
 
+            if (rule == "just_text") and (not response.replace(" ", "").isalpha()):
+                raise InvalidEntry("Resposta inválida. Digite apenas LETRAS, sem números ou caracteres especiais.")
+            
+            return response
+
+        except InvalidEntry as e:
+            print("[!] ", e)
+            
 def add_contact(name:str, number:str="", email:str=""):
     contact_id = len(contactList) + 1
 
@@ -65,20 +65,20 @@ def add_contact(name:str, number:str="", email:str=""):
     print("[!] Contato adicionado com êxito.")
 
 def edit_contact(contact_id:int, name:str="", number:str="", email:str=""):
-    if contact_id in contactList:
 
-        if name != "":
-            contactList[contact_id]['Name'] = name
+    if contact_id not in contactList: # --caiosalesi: só coloquei a tratativa do erro antes, como falei, o return interrompe a execução do def
+        return print(f"[!] Esse ID ({contact_id}) não existe na sua lita de contatos.")
 
-        if number != "":
-            contactList[contact_id]['Number'] = number
+    if name != "":
+        contactList[contact_id]['Name'] = name
 
-        if email != "":
-            contactList[contact_id]['E-mail'] = email
+    if number != "":
+        contactList[contact_id]['Number'] = number
 
-        print("[!] Contato editado com êxito.")
-    else:
-        print(f"[!] Esse ID ({contact_id}) não existe na sua lita de contatos.")
+    if email != "":
+        contactList[contact_id]['E-mail'] = email
+
+    return print("[!] Contato editado com êxito.")       
 
 def rm_contact(contact_id:int):
     try:
@@ -173,7 +173,10 @@ def import_contacts(filename:str):
         print("[!] Arquivo não encontrado.")
 
 # Program
-while 1:
+while True: # --caiosalesi: em vez de colocar 0 e 1, EU prefiro true e false pois fica mais legível, isso vale pra casos la atras tambem
+
+    option = ''
+
     print("\nCONTACT LIST PYTHON PROGRAM - Selecione uma opção:")
     print("[1] Ver lista de contatos")
     print("[2] Buscar contato")
@@ -184,57 +187,63 @@ while 1:
     print("[7] Carregar lista de contatos de CSV")
     print("[8] Sair do programa (as alterações não serão salvas)")
 
-    option = int(input("\n> "))
+    try:
+        option = int(input("\n> "))
+    except Exception:
+        print("[!] Resposta inválida. Digite apenas NÚMEROS, sem letras ou caracteres especiais.")
 
-    if option == 1:
-        show_contacts()
-        sleep(2.5)
+    match option: # --caiosalesi: mano quando for fazer um trilhao de elif nesse sentido coloca um switch-case (no py é match-case), muito melhor
+        case 1:
+            show_contacts()
+            sleep(2.5)
 
-    elif option == 2:
-        search_contacts(str(advanced_input(1, "both", "Pesquisa > ")))
-        sleep(2.5)
+        case 2:
+            search_contacts(str(advanced_input(1, "both", "Pesquisa > ")))
+            sleep(2.5)
 
-    elif option == 3:
-        nameResponse = str(advanced_input(1,"just_text", "Nome > "))
-        numberResponse = str(advanced_input(2, "just_number", "Número > "))
-        emailResponse = str(advanced_input(2, "both", "E-mail > "))
+        case 3:
+            nameResponse = str(advanced_input(1,"just_text", "Nome > "))
+            numberResponse = str(advanced_input(2, "just_number", "Número > "))
+            emailResponse = str(advanced_input(2, "both", "E-mail > "))
 
-        add_contact(nameResponse, numberResponse, emailResponse)
-        sleep(2)
+            add_contact(nameResponse, numberResponse, emailResponse)
+            sleep(2)
 
-    elif option == 4:
-        idResponse = int(advanced_input(1, "just_number", "ID > "))
+        case 4:
+            idResponse = int(advanced_input(1, "just_number", "ID > "))
 
-        if idResponse in contactList:
-            nameResponse = str(advanced_input(2,"just_text", "Nome (mantenha em branco para não alterar) > "))
-            numberResponse = str(advanced_input(2, "just_number", "Número (mantenha em branco para não alterar) > "))
-            emailResponse = str(advanced_input(2, "both", "E-mail (mantenha em branco para não alterar) > "))
+            if idResponse in contactList:
+                nameResponse = str(advanced_input(2,"just_text", "Nome (mantenha em branco para não alterar) > "))
+                numberResponse = str(advanced_input(2, "just_number", "Número (mantenha em branco para não alterar) > "))
+                emailResponse = str(advanced_input(2, "both", "E-mail (mantenha em branco para não alterar) > "))
 
-            edit_contact(idResponse, nameResponse, numberResponse, emailResponse)
-        else:
-            print(f"[!] Esse ID ({idResponse}) não existe na sua lita de contatos.")
+                edit_contact(idResponse, nameResponse, numberResponse, emailResponse)
+            else:
+                print(f"[!] Esse ID ({idResponse}) não existe na sua lita de contatos.")
 
-        sleep(2)
+            sleep(2)
 
-    elif option == 5:
-        idResponse = int(advanced_input(1, "just_number", "ID > "))
+        case 5:
+            idResponse = int(advanced_input(1, "just_number", "ID > "))
 
-        rm_contact(idResponse)
+            rm_contact(idResponse)
 
-        sleep(2)
+            sleep(2)
 
-    elif option == 6:
-        export_contacts(str(advanced_input(2, "just_text", "Nome do arquivo (sem extensão) > ")))
+        case 6:
+            export_contacts(str(advanced_input(2, "just_text", "Nome do arquivo (sem extensão) > ")))
 
-        sleep(2)
+            sleep(2)
 
-    elif option == 7:
-        import_contacts(str(advanced_input(1, "both", "Nome do arquivo > ")))
+        case 7:
+            import_contacts(str(advanced_input(1, "both", "Nome do arquivo > ")))
 
-        sleep (2)
+            sleep (2)
 
-    elif option == 8:
-        quit()
+        case 8:
+            quit()
 
-    else:
-        print("[!] Opção INVÁLIDA. Leia o menu.")
+        case _:
+            if option != '':
+                print("[!] Opção INVÁLIDA. Leia o menu.")
+            sleep (2)
