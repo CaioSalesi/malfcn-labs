@@ -2,6 +2,16 @@ import os
 
 from time import sleep
 
+class Funcoes:
+    listaContatos = 1
+    buscaContatos = 2
+    adicionaContato = 3
+    editaContato = 4
+    removeContato = 5
+    exportaContatos = 6
+    importaContatos = 7
+    sairPrograma = 8
+
 class InvalidEntry(Exception):
     pass
 
@@ -193,57 +203,42 @@ while True: # --caiosalesi: em vez de colocar 0 e 1, EU prefiro true e false poi
         print("[!] Resposta inválida. Digite apenas NÚMEROS, sem letras ou caracteres especiais.")
 
     match option: # --caiosalesi: mano quando for fazer um trilhao de elif nesse sentido coloca um switch-case (no py é match-case), muito melhor
-        case 1:
+        case Funcoes.listaContatos:
             show_contacts()
-            sleep(2.5)
 
-        case 2:
+        case Funcoes.buscaContatos:
             search_contacts(str(advanced_input(1, "both", "Pesquisa > ")))
-            sleep(2.5)
 
-        case 3:
+        case Funcoes.adicionaContato:
             nameResponse = str(advanced_input(1,"just_text", "Nome > "))
             numberResponse = str(advanced_input(2, "just_number", "Número > "))
             emailResponse = str(advanced_input(2, "both", "E-mail > "))
-
             add_contact(nameResponse, numberResponse, emailResponse)
-            sleep(2)
 
-        case 4:
+        case Funcoes.editaContato:
             idResponse = int(advanced_input(1, "just_number", "ID > "))
-
             if idResponse in contactList:
                 nameResponse = str(advanced_input(2,"just_text", "Nome (mantenha em branco para não alterar) > "))
                 numberResponse = str(advanced_input(2, "just_number", "Número (mantenha em branco para não alterar) > "))
                 emailResponse = str(advanced_input(2, "both", "E-mail (mantenha em branco para não alterar) > "))
-
                 edit_contact(idResponse, nameResponse, numberResponse, emailResponse)
             else:
                 print(f"[!] Esse ID ({idResponse}) não existe na sua lita de contatos.")
 
-            sleep(2)
-
-        case 5:
+        case Funcoes.removeContato:
             idResponse = int(advanced_input(1, "just_number", "ID > "))
-
             rm_contact(idResponse)
 
-            sleep(2)
-
-        case 6:
+        case Funcoes.exportaContatos:
             export_contacts(str(advanced_input(2, "just_text", "Nome do arquivo (sem extensão) > ")))
 
-            sleep(2)
-
-        case 7:
+        case Funcoes.importaContatos:
             import_contacts(str(advanced_input(1, "both", "Nome do arquivo > ")))
 
-            sleep (2)
-
-        case 8:
+        case Funcoes.sairPrograma:
             quit()
 
         case _:
             if option != '':
                 print("[!] Opção INVÁLIDA. Leia o menu.")
-            sleep (2)
+    sleep (2)
