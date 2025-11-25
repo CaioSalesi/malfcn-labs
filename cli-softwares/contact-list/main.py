@@ -217,13 +217,15 @@ while True: # --caiosalesi: em vez de colocar 0 e 1, EU prefiro true e false poi
 
         case Funcoes.editaContato:
             idResponse = int(advanced_input(1, "just_number", "ID > "))
-            if idResponse in contactList:
-                nameResponse = str(advanced_input(2,"just_text", "Nome (mantenha em branco para não alterar) > "))
-                numberResponse = str(advanced_input(2, "just_number", "Número (mantenha em branco para não alterar) > "))
-                emailResponse = str(advanced_input(2, "both", "E-mail (mantenha em branco para não alterar) > "))
-                edit_contact(idResponse, nameResponse, numberResponse, emailResponse)
-            else:
+            
+            if idResponse not in contactList:
                 print(f"[!] Esse ID ({idResponse}) não existe na sua lita de contatos.")
+                break
+
+            nameResponse = str(advanced_input(2,"just_text", "Nome (mantenha em branco para não alterar) > "))
+            numberResponse = str(advanced_input(2, "just_number", "Número (mantenha em branco para não alterar) > "))
+            emailResponse = str(advanced_input(2, "both", "E-mail (mantenha em branco para não alterar) > "))
+            edit_contact(idResponse, nameResponse, numberResponse, emailResponse)            
 
         case Funcoes.removeContato:
             idResponse = int(advanced_input(1, "just_number", "ID > "))
