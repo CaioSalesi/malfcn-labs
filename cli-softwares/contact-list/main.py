@@ -42,10 +42,10 @@ def advanced_input(mode:int, rule:str, input_text:str):
             if (response == "") and (mode == 1):
                 raise InvalidEntry("Esse campo é obrigatório.")
             
-            if (rule == "just_number") and (not response.isnumeric()):
+            if (rule == "just_number") and (not response.isnumeric()) and (response != ""):
                 raise InvalidEntry("Resposta inválida. Digite apenas NÚMEROS, sem letras ou caracteres especiais.")
 
-            if (rule == "just_text") and (not response.replace(" ", "").isalpha()):
+            if (rule == "just_text") and (not response.replace(" ", "").isalpha()) and (response != ""):
                 raise InvalidEntry("Resposta inválida. Digite apenas LETRAS, sem números ou caracteres especiais.")
             
             return response
@@ -78,7 +78,7 @@ def edit_contact(contact_id:int, name:str="", number:str="", email:str=""):
     if email != "":
         contactList[contact_id]['E-mail'] = email
 
-    return print("[!] Contato editado com êxito.")       
+    return print("[!] Contato editado com êxito.")
 
 def rm_contact(contact_id:int):
     try:
